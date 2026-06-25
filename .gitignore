@@ -1,0 +1,24 @@
+# Node Modules
+node_modules/
+**/node_modules/
+
+# Environment Files
+.env
+**/.env
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Personal Notes
+Notes/
+
+# Temporary Files
+*.tmp
+*.temp

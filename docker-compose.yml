@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: task_queue_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: task_queue_db
+    ports:
+      - "5433:5432"
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: task_queue_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
