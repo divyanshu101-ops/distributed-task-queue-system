@@ -1,6 +1,7 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
 import { processJob } from "../services/jobProcessor.js";
+import { updateJobStatus } from "../services/jobService.js";
 
 dotenv.config();
 
@@ -32,10 +33,10 @@ export const consumeJobs = async () => {
     channel.consume(process.env.QUEUE_NAME, async (msg) => {
 
         if (!msg) return;
-
+        let job;
         try {
 
-            const job = JSON.parse(msg.content.toString());
+            job = JSON.parse(msg.content.toString());
 
             console.log("Job Received:");
             console.log(job);
@@ -50,7 +51,13 @@ export const consumeJobs = async () => {
         } catch (error) {
 
             console.error("Error Processing Job:", error.message);
+                console.error(error.message);
 
+                try {
+                    await updateJobStatus(job.id, "failed");
+                } catch(dbError) {
+                    console.error("Database Update Failed:", dbError.message);
+                }
             // Abhi intentionally ACK nahi bhejenge.
             // Message queue me rahega.
             // Next chapter me NACK aur Retry implement karenge.

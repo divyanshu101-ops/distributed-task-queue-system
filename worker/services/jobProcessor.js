@@ -1,41 +1,21 @@
-import pool from "../config/db.js";
+import { updateJobStatus } from "./jobService.js";
 
 export const processJob = async (job) => {
 
-    console.log(`🚀 Processing Job ${job.id}`);
+    console.log(`Processing Job ${job.id}`);
 
-    // 1. Update status -> processing
-    await pool.query(
-        `
-        UPDATE jobs
-        SET status = 'processing',
-            updated_at = NOW()
-        WHERE id = $1;
-        `,
-        [job.id]
-    );
+    // Update status → processing
+    await updateJobStatus(job.id, "processing");
+    console.log("Status Updated -> processing");
 
-    console.log(" Status Updated -> processing");
-
-    // 2. Fake execution (abhi sirf demo)
-    console.log("Started:", new Date().toLocaleTimeString());
-
-    await new Promise(resolve => setTimeout(resolve, 50000));
-
-    console.log("Finished:", new Date().toLocaleTimeString());
+    // Fake work
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     
+    throw new Error("Email service failed");
+     
+    console.log("Job Execution Completed");
 
-    // 3. Update status -> completed
-    await pool.query(
-        `
-        UPDATE jobs
-        SET status = 'completed',
-            updated_at = NOW()
-        WHERE id = $1;
-        `,
-        [job.id]
-    );
-
-    console.log("Status Updated -> completed");
-
+    // Update status → completed
+    await updateJobStatus(job.id, "completed");
+    console.log("Status Updated");
 };
