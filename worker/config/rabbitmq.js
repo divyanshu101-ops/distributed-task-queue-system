@@ -1,9 +1,11 @@
 import amqp from "amqplib";
 import dotenv from "dotenv";
 import { processJob } from "../services/jobProcessor.js";
-import { updateJobStatus } from "../services/jobService.js";
+import { updateJobStatus, getJobById } from "../services/jobService.js";
 
 dotenv.config();
+ 
+const MAX_RETRIES = Number(process.env.MAX_RETRIES);
 
 let connection;
 let channel;
@@ -17,7 +19,12 @@ export const connectRabbitMQ = async () => {
         console.log("Channel Created");
 
         await channel.assertQueue(process.env.QUEUE_NAME);
-        console.log(`Queue "${process.env.QUEUE_NAME}" Ready`);
+
+        await channel.assertQueue(process.env.RETRY_QUEUE);
+
+        await channel.assertQueue(process.env.DLQ_NAME);
+
+        console.log(`Queues "${process.env.QUEUE_NAME}, ${process.env.DLQ_NAME}, ${process.env.RETRY_QUEUE}" Ready`);
 
         await channel.prefetch(1);
         console.log("Prefetch Count = 1");
@@ -33,11 +40,14 @@ export const consumeJobs = async () => {
     channel.consume(process.env.QUEUE_NAME, async (msg) => {
 
         if (!msg) return;
+        
         let job;
+
         try {
 
             job = JSON.parse(msg.content.toString());
 
+            console.log();
             console.log("Job Received:");
             console.log(job);
 
@@ -49,18 +59,23 @@ export const consumeJobs = async () => {
             console.log("ACK Sent");
 
         } catch (error) {
+            console.error("Error Processing Job: ", error.message);
 
-            console.error("Error Processing Job:", error.message);
-                console.error(error.message);
+            if(job){
+                await updateJobStatus(job.id, "failed");
+            }
 
-                try {
-                    await updateJobStatus(job.id, "failed");
-                } catch(dbError) {
-                    console.error("Database Update Failed:", dbError.message);
-                }
-            // Abhi intentionally ACK nahi bhejenge.
-            // Message queue me rahega.
-            // Next chapter me NACK aur Retry implement karenge.
+            const dbJob = await getJobById(job.id);
+
+            if(dbJob.attempts < MAX_RETRIES){
+                console.log("Retrying Job...");
+
+                channel.nack(msg, false, true);
+            }else{
+                console.log("Maximum Retry Reached");
+
+                channel.nack(msg, false, false);
+            }
         }
 
     });
