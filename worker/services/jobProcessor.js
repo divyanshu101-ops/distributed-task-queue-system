@@ -1,19 +1,13 @@
-import {
-    updateJobStatus,
-    incrementAttempts
-} from "./jobService.js";
-
+import { updateJobStatus, incrementAttempts } from "./jobService.js";
 import dotenv from "dotenv";
 
 dotenv.config();
-
 const MAX_RETRIES = Number(process.env.MAX_RETRIES);
 
 export const processJob = async (job) => {
 
     // Increment retry count
     const attempts = await incrementAttempts(job.id);
-
     console.log(`Attempt Number: ${attempts}`);
 
     // Stop processing if retry limit is reached
@@ -28,13 +22,14 @@ export const processJob = async (job) => {
 
     console.log("Status Updated -> processing");
 
-    // Simulate business logic
+    // --------- Business Logic ------------
+
+    // Simulate long-running task
     await new Promise(resolve => setTimeout(resolve, 5000));
 
     // Simulate failure
     throw new Error("Email service failed");
 
-    // Success flow (will be used later)
     await updateJobStatus(job.id, "completed");
 
     console.log("Status Updated -> completed");

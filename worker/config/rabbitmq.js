@@ -2,9 +2,10 @@ import amqp from "amqplib";
 import dotenv from "dotenv";
 import { processJob } from "../services/jobProcessor.js";
 import { updateJobStatus, getJobById } from "../services/jobService.js";
+import { setupRabbitMQ } from "../rabbitmq/setupRabbitMQ.js";
 
 dotenv.config();
- 
+
 const MAX_RETRIES = Number(process.env.MAX_RETRIES);
 
 let connection;
@@ -17,30 +18,71 @@ export const connectRabbitMQ = async () => {
 
         channel = await connection.createChannel();
         console.log("Channel Created");
+        console.log();
 
-        await channel.assertQueue(process.env.QUEUE_NAME);
-
-        await channel.assertQueue(process.env.RETRY_QUEUE);
-
-        await channel.assertQueue(process.env.DLQ_NAME);
-
-        console.log(`Queues "${process.env.QUEUE_NAME}, ${process.env.DLQ_NAME}, ${process.env.RETRY_QUEUE}" Ready`);
+        await setupRabbitMQ(channel);
 
         await channel.prefetch(1);
         console.log("Prefetch Count = 1");
+        console.log();
     } catch (error) {
         console.error("RabbitMQ Error:", error.message);
         process.exit(1);
     }
 };
 
+export const publishRetryJob = async (job) => {
+
+    if (!channel) {
+        throw new Error("RabbitMQ channel is not initialized");
+    }
+
+    const published = channel.publish(
+        process.env.RETRY_EXCHANGE,
+        process.env.RETRY_ROUTING_KEY,
+        Buffer.from(JSON.stringify(job)),
+        {
+            persistent: true,
+        }
+    );
+
+    if (!published) {
+        throw new Error("Failed to publish retry job");
+    }
+
+    console.log("Job Published To Retry Queue");
+};
+
+export const publishToDLQ = async (job) => {
+
+    if (!channel) {
+        throw new Error("RabbitMQ channel is not initialized");
+    }
+
+    const published = channel.publish(
+        process.env.DLX_EXCHANGE,
+        process.env.DLQ_ROUTING_KEY,
+        Buffer.from(JSON.stringify(job)),
+        {
+            persistent: true,
+        }
+    );
+
+    if (!published) {
+        throw new Error("Failed to publish DLQ job");
+    }
+
+    console.log("Job Published To Dead Letter Queue");
+};
+
 export const consumeJobs = async () => {
+
     console.log("Waiting for jobs...");
 
     channel.consume(process.env.QUEUE_NAME, async (msg) => {
 
         if (!msg) return;
-        
+
         let job;
 
         try {
@@ -53,30 +95,59 @@ export const consumeJobs = async () => {
 
             await processJob(job);
 
-            // Tell RabbitMQ that job is processed successfully
             channel.ack(msg);
-
             console.log("ACK Sent");
 
         } catch (error) {
-            console.error("Error Processing Job: ", error.message);
 
-            if(job){
-                await updateJobStatus(job.id, "failed");
+            console.error("Error Processing Job:", error.message);
+
+            if (!job) {
+                console.error("Invalid Job Message");
+                channel.nack(msg, false, false);
+                return;
             }
 
             const dbJob = await getJobById(job.id);
 
-            if(dbJob.attempts < MAX_RETRIES){
-                console.log("Retrying Job...");
+            if (!dbJob) {
+                throw new Error(`Job ${job.id} not found`);
+            }
 
-                channel.nack(msg, false, true);
-            }else{
-                console.log("Maximum Retry Reached");
+            try {
 
-                channel.nack(msg, false, false);
+                if (dbJob.attempts < MAX_RETRIES) {
+
+                    console.log("Publishing Job To Retry Queue...");
+
+                    await publishRetryJob(job);
+
+                    await updateJobStatus(job.id, "retrying");
+                    console.log("Status Updated -> retrying");
+
+                } else {
+
+                    console.log("Publishing Job To Dead Letter Queue...");
+
+                    await publishToDLQ(job);
+
+                    await updateJobStatus(job.id, "dead_lettered");
+                    console.log("Status Updated -> dead_lettered");
+                }
+
+                channel.ack(msg);
+                console.log("ACK Sent");
+
+            } catch (publishError) {
+
+                console.error(
+                    "Failed to publish retry/DLQ message:",
+                    publishError.message
+                );
+
+                // Do NOT ACK.
+                // RabbitMQ will redeliver the original message.
             }
         }
-
     });
 };
