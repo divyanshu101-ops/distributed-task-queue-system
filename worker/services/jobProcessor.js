@@ -28,8 +28,12 @@ export const processJob = async (job) => {
     await new Promise(resolve => setTimeout(resolve, 5000));
 
     // Simulate failure
-    throw new Error("Email service failed");
+    // throw new Error("Email service failed");
 
+    console.log("Email Sent Successfully");
+
+    process.exit(1);
+    
     await updateJobStatus(job.id, "completed");
 
     console.log("Status Updated -> completed");
