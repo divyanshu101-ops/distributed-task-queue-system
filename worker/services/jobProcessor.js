@@ -31,8 +31,6 @@ export const processJob = async (job) => {
     // throw new Error("Email service failed");
 
     console.log("Email Sent Successfully");
-
-    process.exit(1);
     
     await updateJobStatus(job.id, "completed");
 

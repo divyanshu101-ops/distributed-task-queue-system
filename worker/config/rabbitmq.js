@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { processJob } from "../services/jobProcessor.js";
 import { updateJobStatus, getJobById } from "../services/jobService.js";
 import { setupRabbitMQ } from "../rabbitmq/setupRabbitMQ.js";
+import { getRedisClient } from "./redis.js";
 
 dotenv.config();
 
@@ -93,7 +94,34 @@ export const consumeJobs = async () => {
             console.log("Job Received:");
             console.log(job);
 
+            const redisClient = getRedisClient();
+
+            const redisKey = `job:${job.id}`;
+
+            const isProcessed = await redisClient.exists(redisKey);
+
+            if(isProcessed){
+                console.log(`job ${job.id} already processed. Skipping...`);
+
+                channel.ack(msg);
+
+                console.log("Ack Sent");
+
+                return;
+            }
+
             await processJob(job);
+
+
+            await redisClient.set(
+                redisKey, 
+                "processed", 
+                {
+                    EX:86400
+                }
+            );
+
+            console.log(`Redis Key Stored: ${redisKey}`);
 
             channel.ack(msg);
             console.log("ACK Sent");
