@@ -32,6 +32,8 @@ export const processJob = async (job) => {
 
     console.log("Email Sent Successfully");
     
+    process.exit(1);
+
     await updateJobStatus(job.id, "completed");
 
     console.log("Status Updated -> completed");
