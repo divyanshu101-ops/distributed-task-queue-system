@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Distributed Task Queue Dashboard</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+</head>
+
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <div class="container">
+
+        <%- include("partials/sidebar") %>
+
+        <main class="content">
+
+            <h1>Distributed Task Queue Dashboard</h1>
+
+            <div class="cards">
+
+                <div class="card total">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Total Jobs</h3>
+
+                        <span class="card-icon">📦</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.totalJobs %></p>
+
+                </div>
+
+                <div class="card pending-card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Pending</h3>
+
+                        <span class="card-icon">🕒</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.pending %></p>
+
+                </div>
+
+                <div class="card processing-card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Processing</h3>
+
+                        <span class="card-icon">⚙️</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.processing %></p>
+
+                </div>
+
+                <div class="card completed-card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Completed</h3>
+
+                        <span class="card-icon">✅</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.completed %></p>
+
+                </div>
+
+                <div class="card retrying-card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Retrying</h3>
+
+                        <span class="card-icon">🔄</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.retrying %></p>
+
+                </div>
+
+                <div class="card dead-card">
+
+                    <div class="card-header">
+
+                        <h3 class="card-title">Dead Lettered</h3>
+
+                        <span class="card-icon">❌</span>
+
+                    </div>
+
+                    <p class="card-value"><%= stats.deadLettered %></p>
+
+                </div>
+
+            </div>
+
+            <div class="section-title">
+
+                <h2>Latest Queue Activity</h2>
+
+                <a href="/jobs" class="view-all">
+                    View All →
+                </a>
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Attempts</th>
+                        <th>Created</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <% if (recentJobs.length === 0) { %>
+
+                        <tr>
+
+                            <td colspan="6" class="empty-state">
+                                No jobs found.
+                            </td>
+
+                        </tr>
+
+                    <% } else { %>
+
+                        <% recentJobs.forEach(job => { %>
+
+                            <tr>
+
+                                <td><%= job.id %></td>
+
+                                <td><%= job.type %></td>
+
+                                <td>
+
+                                    <span class="badge
+                                        <%= job.status === 'completed' ? 'completed' :
+                                            job.status === 'pending' ? 'pending' :
+                                            job.status === 'processing' ? 'processing' :
+                                            job.status === 'retrying' ? 'retrying' :
+                                            'dead' %>">
+
+                                        <%= job.status %>
+
+                                    </span>
+
+                                </td>
+
+                                <td><%= job.attempts %></td>
+
+                                <td>
+
+                                    <%= new Date(job.created_at).toLocaleDateString() %>
+
+                                </td>
+
+                                <td>
+
+                                    <% if(job.status === "dead_lettered"){ %>
+
+                                        <button class="action-btn">
+                                            Retry
+                                        </button>
+
+                                    <% } else { %>
+
+                                        <button class="action-btn">
+                                            View
+                                        </button>
+
+                                    <% } %>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    <% } %>
+
+                </tbody>
+
+            </table>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
