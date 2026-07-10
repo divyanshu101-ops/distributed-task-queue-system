@@ -22,3 +22,7 @@ Notes/
 # Temporary Files
 *.tmp
 *.temp
+
+# Generated Reports
+reports/*
+!reports/.gitkeep

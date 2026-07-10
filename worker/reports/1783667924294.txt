@@ -1,0 +1,7 @@
+Report Name : Daily Sales Report
+
+Generated At : 7/10/2026, 12:48:44 PM
+
+----------------------------------------
+
+Today's total sales: ₹52,000

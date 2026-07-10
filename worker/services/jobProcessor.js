@@ -1,4 +1,7 @@
 import { updateJobStatus, incrementAttempts } from "./jobService.js";
+import { processEmail } from "../processors/emailProcessor.js";
+import { processReport } from "../processors/reportProcessor.js";
+
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -24,15 +27,18 @@ export const processJob = async (job) => {
 
     // --------- Business Logic ------------
 
-    // Simulate long-running task
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    switch (job.type) {
+        case "email" : 
+            await processEmail(job.payload);
+            break;
 
-    // Simulate failure
-    // throw new Error("Email service failed");
-
-    console.log("Email Sent Successfully");
-    
-    process.exit(1);
+        case "report" :
+            await processReport(job.payload);
+            break;
+        default:
+            console.log(`Unknown Job Type: ${job.type}`);
+            throw new Error(`Unsupported job type: ${job.type}`); 
+    }
 
     await updateJobStatus(job.id, "completed");
 
