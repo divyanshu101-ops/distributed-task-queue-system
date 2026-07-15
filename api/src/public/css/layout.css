@@ -124,9 +124,13 @@ body{
    Sidebar
 ===================================================== */
 
+/* =====================================================
+   Sidebar
+===================================================== */
+
 .sidebar{
 
-    width:260px;
+    width:300px;
 
     background:#191919;
 
@@ -142,7 +146,7 @@ body{
 
 .sidebar-header{
 
-    padding:30px 25px 10px;
+    padding:35px 28px 20px;
 
 }
 
@@ -152,19 +156,27 @@ body{
 
     color:#bdbdbd;
 
+    font-weight:600;
+
 }
 
 .sidebar-menu{
 
     list-style:none;
 
-    padding:15px;
+    padding:20px;
 
 }
 
 .sidebar-menu li{
 
-    margin-bottom:10px;
+    margin-bottom:18px;
+
+}
+
+.sidebar-menu li:last-child{
+
+    margin-bottom:0;
 
 }
 
@@ -174,25 +186,27 @@ body{
 
     align-items:center;
 
-    gap:14px;
+    gap:18px;
 
-    padding:14px 16px;
+    padding:18px 20px;
 
-    font-size:16px;
+    font-size:17px;
 
     color:white;
 
     text-decoration:none;
 
-    border-radius:10px;
+    border-radius:12px;
 
-    transition:0.2s;
+    transition:all 0.2s ease;
 
 }
 
 .sidebar-menu li a:hover{
 
     background:#2b2b2b;
+
+    transform:translateX(4px);
 
 }
 
@@ -202,23 +216,25 @@ body{
 
     color:#111;
 
-    font-weight:bold;
+    font-weight:700;
 
 }
 
 .menu-icon{
 
-    width:24px;
+    width:30px;
 
     text-align:center;
 
-    font-size:18px;
+    font-size:22px;
+
+    flex-shrink:0;
 
 }
 
 .sidebar-footer{
 
-    padding:25px;
+    padding:30px 25px;
 
     border-top:1px solid #2d2d2d;
 
@@ -228,15 +244,17 @@ body{
 
 .sidebar-footer p{
 
-    font-size:14px;
+    font-size:15px;
 
-    margin-bottom:5px;
+    margin-bottom:6px;
+
+    font-weight:600;
 
 }
 
 .sidebar-footer small{
 
-    font-size:12px;
+    font-size:13px;
 
 }
 

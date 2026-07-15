@@ -17,10 +17,11 @@
 <body>
 
     <%- include("partials/navbar") %>
-
+    
     <div class="container">
-
-        <%- include("partials/sidebar") %>
+        
+        <!-- Pass activePage to sidebar -->
+        <%- include("partials/sidebar", { activePage: "dashboard" }) %>
 
         <main class="content">
 

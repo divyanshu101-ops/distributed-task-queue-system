@@ -49,6 +49,10 @@ router.post("/", async (req, res) => {
     }
 });
 
+router.get("/create", (req, res) => {
+    res.render("createJob");
+});
+
 router.get("/", async (req, res) => {
     try {
         const result = await pool.query(`
@@ -158,4 +162,6 @@ router.post("/:id/retry", async (req, res) => {
         })
     }
 });
+
+
 export default router;

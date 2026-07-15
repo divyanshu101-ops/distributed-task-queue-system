@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Job</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/createJob.css">
+
+</head>
+
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <div class="container">
+
+        <!-- Pass activePage to sidebar -->
+        <%- include("partials/sidebar", { activePage: "createJob" }) %>
+
+        <main class="content">
+
+            <div class="page-header">
+
+                <h1>Create Job</h1>
+
+                <p>
+                    Create and submit a new background job to the queue.
+                </p>
+
+            </div>
+
+            <div class="form-card">
+
+                <form id="jobForm">
+
+                    <div class="form-group">
+
+                        <label for="jobType">
+                            Job Type
+                        </label>
+
+                        <select id="jobType"
+                                name="type">
+
+                            <option value="">
+                                Select Job Type
+                            </option>
+
+                            <option value="email">
+                                Email
+                            </option>
+
+                            <option value="report">
+                                Report
+                            </option>
+
+                            <option value="notification">
+                                Notification
+                            </option>
+
+                            <option value="image">
+                                Image
+                            </option>
+
+                            <option value="file">
+                                File
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Dynamic Fields -->
+
+                    <div id="dynamicFields">
+
+                    </div>
+
+                    <button type="submit"
+                            class="submit-btn">
+
+                        Create Job
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- JavaScript Linked to EJS file --> 
+    <script src="/js/createJob.js"></script>
+</body>
+
+</html>
