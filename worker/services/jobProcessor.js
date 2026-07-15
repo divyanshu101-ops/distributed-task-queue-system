@@ -1,6 +1,9 @@
 import { updateJobStatus, incrementAttempts } from "./jobService.js";
-import { processEmail } from "../processors/emailProcessor.js";
-import { processReport } from "../processors/reportProcessor.js";
+import { processEmail } from "../jobs/processors/emailProcessor.js";
+import { processReport } from "../jobs/processors/reportProcessor.js";
+import { processNotification } from "../jobs/processors/notificationProcessor.js";
+import { processImage } from "../jobs/processors/imageProcessor.js";
+import { processFile } from "../jobs/processors/fileProcessor.js";
 
 import dotenv from "dotenv";
 
@@ -31,10 +34,18 @@ export const processJob = async (job) => {
         case "email" : 
             await processEmail(job.payload);
             break;
-
         case "report" :
             await processReport(job.payload);
             break;
+        case "notification" :
+            await processNotification(job.payload);
+            break;
+        case "image" :
+            await processImage(job.payload);
+            break;
+        case "file" :
+            await processFile(job.payload);
+            break;    
         default:
             console.log(`Unknown Job Type: ${job.type}`);
             throw new Error(`Unsupported job type: ${job.type}`); 

@@ -10,7 +10,12 @@ export const processReport = async (payload) => {
         throw new Error("Invalid report payload");
     }
 
-    const reportsFolder = path.join(process.cwd(), "reports");
+    const reportsFolder = path.join(
+        process.cwd(),
+        "jobs",
+        "storage",
+        "reports"
+    );
 
     await fs.mkdir(reportsFolder, {
         recursive: true
