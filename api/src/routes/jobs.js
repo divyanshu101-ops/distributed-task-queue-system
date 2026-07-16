@@ -1,20 +1,86 @@
 import express from "express";
 import pool from "../config/db.js";
 import { publishJob}  from "../config/rabbitmq.js";
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
-    console.log("Route Hit");
-    console.log(req.body);
-    try {
-        const { type, payload } = req.body;
+router.post("/", upload.single("file"), async (req, res) => {
 
-        if (!type || !payload) {
-            return res.status(400).json({
-                success: false,
-                message: "type and payload are required"
-            });
+    try {
+
+        const { type } = req.body;
+
+        let payload = {};
+
+        switch (type) {
+
+            case "email":
+
+                payload = {
+                    to: req.body.to,
+                    subject: req.body.subject,
+                    message: req.body.message
+                };
+
+                break;
+
+            case "report":
+
+                payload = {
+                    reportName: req.body.reportName,
+                    content: req.body.content
+                };
+
+                break;
+
+            case "notification":
+
+                payload = {
+                    title: req.body.title,
+                    userId: req.body.userId,
+                    message: req.body.message
+                };
+
+                break;
+
+            case "image":
+
+                if (!req.file) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Image is required."
+                    });
+                }
+
+                payload = {
+                    imageName: req.file.filename
+                };
+
+                break;
+
+            case "file":
+
+                if (!req.file) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "File is required."
+                    });
+                }
+
+                payload = {
+                    fileName: req.file.filename
+                };
+
+                break;
+
+            default:
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid Job Type"
+                });
+
         }
 
         const result = await pool.query(
@@ -29,7 +95,7 @@ router.post("/", async (req, res) => {
         const job = {
             id: result.rows[0].id,
             type: result.rows[0].type,
-            payload: result.rows[0].payload, 
+            payload: result.rows[0].payload
         };
 
         await publishJob(job);
@@ -40,13 +106,16 @@ router.post("/", async (req, res) => {
         });
 
     } catch (err) {
+
         console.error(err);
 
         return res.status(500).json({
             success: false,
             message: "Internal Server Error"
         });
+
     }
+
 });
 
 router.get("/create", (req, res) => {

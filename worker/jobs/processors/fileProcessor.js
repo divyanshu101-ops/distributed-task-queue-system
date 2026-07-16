@@ -10,16 +10,18 @@ export const processFile = async (payload) => {
         throw new Error("Invalid file payload");
     }
 
+    // Shared uploads folder
     const uploadsFolder = path.join(
         process.cwd(),
-        "jobs",
+        "..",
         "storage",
         "uploads"
     );
 
+    // Shared processed files folder
     const processedFolder = path.join(
         process.cwd(),
-        "jobs",
+        "..",
         "storage",
         "processed-files"
     );

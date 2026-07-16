@@ -10,16 +10,18 @@ export const processImage = async (payload) => {
         throw new Error("Invalid image payload");
     }
 
+    // Shared uploads folder
     const imagesFolder = path.join(
         process.cwd(),
-        "jobs",
+        "..",
         "storage",
         "uploads"
     );
 
+    // Shared processed images folder
     const processedFolder = path.join(
         process.cwd(),
-        "jobs",
+        "..",
         "storage",
         "processed-images"
     );
@@ -33,7 +35,8 @@ export const processImage = async (payload) => {
         payload.imageName
     );
 
-    const processedFileName = `processed-${Date.now()}-${payload.imageName}`;
+    const processedFileName =
+        `processed-${Date.now()}-${payload.imageName}`;
 
     const destinationPath = path.join(
         processedFolder,
@@ -44,7 +47,6 @@ export const processImage = async (payload) => {
 
     console.log(`Source      : ${payload.imageName}`);
     console.log(`Output File : ${processedFileName}`);
-
     console.log("Image Processed Successfully");
 
 };
