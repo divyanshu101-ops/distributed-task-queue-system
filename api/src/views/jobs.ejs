@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Jobs Dashboard</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/jobs.css">
+
+</head>
+
+<body>
+
+    <%- include("partials/navbar") %>
+
+        <div class="container">
+
+            <%- include("partials/sidebar", { activePage: "jobs" }) %>
+
+                <main class="content">
+
+                    <div class="page-header">
+
+                        <div>
+
+                            <h1>Jobs Dashboard</h1>
+
+                            <p>
+                                Monitor every background job running inside the distributed task queue.
+                            </p>
+
+                        </div>
+
+                        <div>
+
+                            <a href="/create-job" class="create-job-btn">
+
+                                + Create Job
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <% if(jobs.length===0){ %>
+
+                        <div class="empty-state">
+
+                            <h2>No Jobs Found</h2>
+
+                            <p>
+
+                                There are currently no jobs available in the queue.
+
+                            </p>
+
+                        </div>
+
+                        <% } else { %>
+
+                            <div class="table-card">
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>ID</th>
+
+                                            <th>Type</th>
+
+                                            <th>Status</th>
+
+                                            <th>Attempts</th>
+
+                                            <th>Created</th>
+
+                                            <th>Updated</th>
+
+                                            <th>Action</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        <% jobs.forEach(job=> { %>
+
+                                            <tr>
+
+                                                <td>
+
+                                                    #<%= job.id %>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <span class="type-badge <%= job.type %>">
+
+                                                        <%= job.type.charAt(0).toUpperCase() + job.type.slice(1) %>
+
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <span class="status-badge
+                                            <%= job.status === 'completed'
+                                                ? 'completed'
+                                                : job.status === 'processing'
+                                                ? 'processing'
+                                                : job.status === 'pending'
+                                                ? 'pending'
+                                                : job.status === 'retrying'
+                                                ? 'retrying'
+                                                : 'dead' %>">
+
+                                                        <%= job.status.replace("_", " " ) %>
+
+                                                    </span>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <%= job.attempts %>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <div class="date-cell">
+
+                                                        <span class="date">
+
+                                                            <%= new Date(job.created_at).toLocaleDateString("en-IN", {
+                                                                day: "2-digit" , month: "short" }) %>
+
+                                                        </span>
+
+                                                        <span class="time">
+
+                                                            <%= new Date(job.created_at).toLocaleTimeString("en-IN", {
+                                                                hour: "2-digit" , minute: "2-digit" }) %>
+
+                                                        </span>
+
+                                                    </div>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <div class="date-cell">
+                                                        <span class="date">
+
+                                                            <%= new Date(job.updated_at).toLocaleDateString("en-IN", {
+                                                                day: "2-digit" , month: "short" , }) %>
+
+                                                        </span>
+
+                                                        <span class="time">
+
+                                                            <%= new Date(job.updated_at).toLocaleTimeString("en-IN", {
+                                                                hour: "2-digit" , minute: "2-digit" }) %>
+
+                                                        </span>
+                                                    </div>
+
+                                                </td>
+
+                                                <td>
+
+                                                    <a href="/jobs/<%= job.id %>" class="view-btn">
+
+                                                        View
+
+                                                    </a>
+
+                                                </td>
+
+                                            </tr>
+
+                                            <% }) %>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <% } %>
+
+                </main>
+
+        </div>
+
+        <script src="/js/jobs.js"></script>
+
+</body>
+
+</html>

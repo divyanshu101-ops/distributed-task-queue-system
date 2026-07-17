@@ -1,6 +1,7 @@
 const jobType = document.getElementById("jobType");
 const dynamicFields = document.getElementById("dynamicFields");
 const jobForm = document.getElementById("jobForm");
+const submitBtn = document.getElementById("submitBtn");
 
 jobType.addEventListener("change", (event) => {
 
@@ -199,6 +200,8 @@ function renderFileFields() {
 jobForm.addEventListener("submit", async (event) => {
 
     event.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Creating...";
 
     const formData = new FormData();
 
@@ -268,7 +271,7 @@ jobForm.addEventListener("submit", async (event) => {
 
     else if (selectedJob === "image") {
 
-        const imageInput = document.getElementById("file");
+        const imageInput = document.getElementById("image");
 
         if (imageInput.files.length > 0) {
 
@@ -301,23 +304,40 @@ jobForm.addEventListener("submit", async (event) => {
     try {
 
         const response = await fetch("/jobs", {
-
             method: "POST",
-
             body: formData
-
         });
 
         const data = await response.json();
 
-        console.log(data);
+        if (response.ok) {
+
+            displayMessage("Job Queued Successfully!");
+
+            jobForm.reset();
+
+            setTimeout(() => {
+
+                window.location.href = "/jobs";
+
+            }, 2500);
+
+        } else {
+
+            displayMessage("Failed to create job.", false);
+
+        }
 
     }
-
     catch (error) {
 
         console.error(error);
 
     }
+    finally {
 
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Create Job";
+
+    }
 });

@@ -1,0 +1,40 @@
+.message-box {
+
+    position: fixed;
+
+    top: 20px;
+    right: 20px;
+
+    background-color: #d80b2d;
+    color: white;
+
+    padding: 15px 25px;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    box-shadow: 0 4px 12px rgba(207, 224, 17, 0.3);
+
+    opacity: 0;
+    transform: translateY(-20px);
+
+    transition: all 0.3s ease;
+
+    z-index: 1000;
+
+}
+
+.message-box.show {
+
+    opacity: 1;
+    transform: translateY(0);
+
+}
+
+.message-box.error {
+
+    background-color: #ef4444;
+
+}

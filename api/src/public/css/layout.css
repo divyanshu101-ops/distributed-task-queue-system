@@ -12,6 +12,7 @@
 body{
     background:#121212;
     color:#ffffff;
+    overflow:hidden;
 }
 
 /* =====================================================
@@ -19,6 +20,14 @@ body{
 ===================================================== */
 
 .navbar{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+    right:0;
+
+    z-index:1000;
 
     height:75px;
 
@@ -116,13 +125,11 @@ body{
 
     display:flex;
 
-    min-height:calc(100vh - 75px);
+    margin-top:75px;
+
+    height:calc(100vh - 75px);
 
 }
-
-/* =====================================================
-   Sidebar
-===================================================== */
 
 /* =====================================================
    Sidebar
@@ -132,6 +139,14 @@ body{
 
     width:300px;
 
+    height:calc(100vh - 75px);
+
+    position:fixed;
+
+    top:75px;
+
+    left:0;
+
     background:#191919;
 
     border-right:1px solid #2d2d2d;
@@ -139,8 +154,6 @@ body{
     display:flex;
 
     flex-direction:column;
-
-    justify-content:space-between;
 
 }
 
@@ -165,6 +178,8 @@ body{
     list-style:none;
 
     padding:20px;
+
+    flex:1;
 
 }
 
@@ -198,7 +213,7 @@ body{
 
     border-radius:12px;
 
-    transition:all 0.2s ease;
+    transition:all .2s ease;
 
 }
 
@@ -234,6 +249,8 @@ body{
 
 .sidebar-footer{
 
+    margin-top:auto;
+
     padding:30px 25px;
 
     border-top:1px solid #2d2d2d;
@@ -264,7 +281,13 @@ body{
 
 .content{
 
-    flex:1;
+    margin-left:300px;
+
+    width:calc(100% - 300px);
+
+    height:calc(100vh - 75px);
+
+    overflow-y:auto;
 
     padding:40px;
 
